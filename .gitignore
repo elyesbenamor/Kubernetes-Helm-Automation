@@ -1,0 +1,13 @@
+# Deployment data
+
+ansible/host_vars/master.yml
+ansible/host_vars/worker.yml
+ansible/secrets/multipass/**/*.gpg
+
+
+# Mac
+*.DS_Store
+
+# PyCharm
+.idea
+.mypy_cache
