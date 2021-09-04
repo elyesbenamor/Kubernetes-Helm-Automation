@@ -1,0 +1,20 @@
+{
+  "logger": {
+    "title": "Remote Sync"
+  },
+  "uploadOnSave": true,
+  "useAtomicWrites": true,
+  "deleteLocal": false,
+  "hostname": "192.168.0.84",
+  "port": "22",
+  "target": "/home/ubuntu",
+  "ignore": [
+    ".remote-sync.json",
+    ".git/**"
+  ],
+  "username": "ubuntu",
+  "keyfile": "C:\\Users\\ebena\\Documents\\multipass\\id_rsa_ansible",
+  "passphrase": "ben3ar9a",
+  "watch": [],
+  "transport": "scp"
+}

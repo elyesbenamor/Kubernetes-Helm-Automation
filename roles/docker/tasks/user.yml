@@ -1,0 +1,9 @@
+---
+- name: Create "docker" group
+  shell: groupadd {{ docker_group }}
+  ignore_errors: yes
+
+# sudo usermod -aG docker root
+- name: Add remote "ubuntu" user to "docker" group
+  shell: usermod -aG docker {{ remote_user }}
+  ignore_errors: yes

@@ -1,0 +1,8 @@
+---
+- name: install openshift
+  pip:
+    name: "{{ item }}"
+    state: present  
+  loop:
+    - PyYAML==5.4.1
+    - openshift==0.12.1

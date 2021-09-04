@@ -1,0 +1,6 @@
+---
+- name: Create a Deployment
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'nginx.yaml') | from_yaml }}"
+    namespace: "{{get_name.result.metadata.name}}"

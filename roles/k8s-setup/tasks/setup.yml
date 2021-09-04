@@ -1,0 +1,67 @@
+---
+- name: Add Kubernetes apt key.
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+  register: add_repository_key
+  ignore_errors: "{{ kubernetes_apt_ignore_key_error }}"
+
+- name: Add Kubernetes repository.
+  apt_repository:
+    repo: "{{ kubernetes_apt_repository }}"
+    state: present
+    update_cache: true
+
+- name: Ensure dependencies are installed.
+  package: name=curl state=present
+
+- name: Install Kubernetes packages.
+  package:
+    name: "{{ item.name | default(item) }}"
+    state: "{{ item.state | default('present') }}"
+  notify: restart kubelet
+  with_items: "{{ kubernetes_packages }}"
+
+- name: Check for existence of kubelet environment file.
+  stat:
+    path: '{{ kubelet_environment_file_path }}'
+  register: kubelet_environment_file
+
+- name: Set facts for KUBELET_EXTRA_ARGS task if environment file exists.
+  set_fact:
+    kubelet_args_path: '{{ kubelet_environment_file_path }}'
+    kubelet_args_line: "{{ 'KUBELET_EXTRA_ARGS=' + kubernetes_kubelet_extra_args }}"
+    kubelet_args_regexp: '^KUBELET_EXTRA_ARGS='
+  when: kubelet_environment_file.stat.exists
+
+- name: Set facts for KUBELET_EXTRA_ARGS task if environment file doesn't exist.
+  set_fact:
+    kubelet_args_path: '/etc/systemd/system/kubelet.service.d/10-kubeadm.conf'
+    kubelet_args_line: "{{ 'Environment=\"KUBELET_EXTRA_ARGS=' + kubernetes_kubelet_extra_args + '\"' }}"
+    kubelet_args_regexp: '^Environment="KUBELET_EXTRA_ARGS='
+  when: not kubelet_environment_file.stat.exists
+
+- name: Configure KUBELET_EXTRA_ARGS.
+  lineinfile:
+    path: '{{ kubelet_args_path }}'
+    line: '{{ kubelet_args_line }}'
+    regexp: '{{ kubelet_args_regexp }}'
+    state: present
+  register: kubelet_config_file
+
+- name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
+  shell: |
+    swapoff -a
+
+- name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+    
+- name: Reload systemd unit if args were changed.
+  systemd:
+    state: restarted
+    daemon_reload: true
+    name: kubelet
+  when: kubelet_config_file is changed

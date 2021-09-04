@@ -1,0 +1,12 @@
+---
+- name: k8s master
+  hosts: masters
+  become: yes
+  gather_facts: yes
+  become_method: sudo
+  vars_files:
+    - group_vars/masters.yml
+    - group_vars/slave.yml
+
+  roles:
+    - { role: clean }

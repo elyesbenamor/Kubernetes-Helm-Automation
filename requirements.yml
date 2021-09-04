@@ -1,0 +1,5 @@
+# ansible-galaxy install -r requirements.yml
+---
+collections:
+  - name: kubernetes.core
+    version: 2.1.1

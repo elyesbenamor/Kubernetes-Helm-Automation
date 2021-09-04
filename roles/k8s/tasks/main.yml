@@ -1,0 +1,15 @@
+---
+
+- name: install requirements
+  include_tasks: dependencies.yml
+
+- name: Create a k8s namespace
+  k8s:
+    name: testing
+    api_version: v1
+    kind: Namespace
+    state: present
+  register: get_name
+
+- name: deploy nginx
+  include_tasks: deploy-nginx.yml
