@@ -1,2 +1,2 @@
-ansible_host: 192.168.0.128
+ansible_host: x.x.x.x
 kubernetes_role: "node"
