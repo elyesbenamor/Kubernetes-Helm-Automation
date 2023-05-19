@@ -9,7 +9,7 @@
     - group_vars/slave.yml
 
   roles:
-    #- { role: system-setup }
-    #- { role: docker }
-    #- { role: k8s-setup }
-    #- { role: helm }
+    - { role: system-setup }
+    - { role: docker }
+    - { role: k8s-setup }
+    - { role: helm }
